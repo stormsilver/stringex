@@ -7,19 +7,35 @@ require File.join(File.dirname(__FILE__), "../init")
 module I18n
   @@locale = nil
   
-  def locale
-    @@locale ||= nil
-  end
-  
-  def locale=(new_locale)
-    @@locale = new_locale
+  class << self
+    def locale
+      @@locale ||= nil
+    end
+    
+    def locale=(new_locale)
+      @@locale = new_locale
+    end
   end
 end
 
 class UnidecoderLocalesTest < Test::Unit::TestCase
-  def setup
+  def teardown
+    # This is fuckall ugly but need to ensure things start fresh
     LuckySneaks::Unidecoder.load_path = nil
     LuckySneaks::Unidecoder.locale = nil
+    LuckySneaks::UnidecoderLocales.send :remove_const, "LOCALES_CODEPOINTS"
+    LuckySneaks::UnidecoderLocales.const_set "LOCALES_CODEPOINTS", Hash.new { |h, k|
+      begin
+        if path = LuckySneaks::Unidecoder.load_path.detect{|p| p =~ /\/#{k}.yml$/}
+          x = YAML::load_file(path)
+          h[k] = x
+        else
+          raise LuckySneaks::Unidecoder::InvalidLoadPath
+        end
+      rescue
+        raise LuckySneaks::Unidecoder::InvalidLoadPath
+      end
+    }
     I18n.locale = nil
   end
   
@@ -56,5 +72,18 @@ class UnidecoderLocalesTest < Test::Unit::TestCase
     LuckySneaks::Unidecoder.load_path = ["test/custom.yml", "test/i18n.yml"]
     I18n.locale = :i18n
     assert_equal "loop-de-loop", LuckySneaks::Unidecoder.decode("∞")
+  end
+  
+  def test_decode_with_no_load_paths
+    LuckySneaks::Unidecoder.locale = :custom
+    assert_raises(LuckySneaks::Unidecoder::InvalidLoadPath) {
+      LuckySneaks::Unidecoder.decode("∞")
+    }
+  end
+  
+  def test_decode_from_character
+    LuckySneaks::Unidecoder.load_path = ["test/custom.yml", "test/i18n.yml"]
+    LuckySneaks::Unidecoder.locale = :custom
+    assert_equal "trademark", LuckySneaks::Unidecoder.decode("™")
   end
 end

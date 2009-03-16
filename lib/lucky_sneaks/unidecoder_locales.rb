@@ -1,13 +1,29 @@
 module LuckySneaks
   # This implementation borrows from Sven Fuch's i18n for Ruby
   # http://github.com/svenfuchs/i18n/tree/master
+  #
+  # Short Version: You add your localized transliterations to the load_path,
+  # then specify a locale to use. Unidecoder can also use the locale
+  # settings from Rails' [or the standalone] I18n. In the latter case,
+  # you will still have to provide Unidecoder with a load path.
+  # 
+  # Localized transliterations must be a YAML-represented Hash containing
+  # key-value pairs of a character's Unicode codepoint and it's desired
+  # transliteration. You may also put the character itself.
+  # 
+  # FWIW: the methods in LuckySneaks::UnidecoderLocales::ClassMethods
+  # are mixed into LuckySneaks::Unidecoder as class method.
   module UnidecoderLocales
     LOCALES_CODEPOINTS = Hash.new { |h, k|
-      if path = LuckySneaks::Unidecoder.load_path.detect{|p| p =~ /\/#{k}.yml$/}
-        x = YAML::load_file(path)
-        h[k] = x
-      else
-        h[k] = {}
+      begin
+        if path = LuckySneaks::Unidecoder.load_path.detect{|p| p =~ /\/#{k}.yml$/}
+          x = YAML::load_file(path)
+          h[k] = x
+        else
+          raise LuckySneaks::Unidecoder::InvalidLoadPath
+        end
+      rescue
+        raise LuckySneaks::Unidecoder::InvalidLoadPath
       end
     } unless defined?(LOCALES_CODEPOINTS)
     
@@ -49,7 +65,8 @@ module LuckySneaks
       
       def try_locales(codepoint, locale_arg = locale)
         return if locale_arg.nil?
-        LuckySneaks::UnidecoderLocales::LOCALES_CODEPOINTS[locale_arg][codepoint.unpack("U").first]
+        LuckySneaks::UnidecoderLocales::LOCALES_CODEPOINTS[locale_arg][codepoint] ||
+          LuckySneaks::UnidecoderLocales::LOCALES_CODEPOINTS[locale_arg][codepoint.unpack("U").first]
       end
     end
   end

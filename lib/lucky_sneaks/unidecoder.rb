@@ -1,4 +1,5 @@
 require "yaml"
+require "lucky_sneaks/unidecoder_exceptions"
 require "lucky_sneaks/unidecoder_locales"
 
 module LuckySneaks
