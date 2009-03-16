@@ -1,4 +1,4 @@
-module LuckySneaks
+module Stringex
   # These methods are all added on String class.
   module StringExtensions
     def self.included(base) # :nodoc:
@@ -30,7 +30,7 @@ module LuckySneaks
     end
     
     # Create a URI-friendly representation of the string. This is used internally by 
-    # acts_as_url[link:classes/LuckySneaks/ActsAsUrl/ClassMethods.html#M000012]
+    # acts_as_url[link:classes/Stringex/ActsAsUrl/ClassMethods.html#M000012]
     # but can be called manually in order to generate an URI-friendly version of any string.
     def to_url
       remove_formatting.downcase.replace_whitespace("-").collapse("-")

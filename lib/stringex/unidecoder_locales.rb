@@ -1,4 +1,4 @@
-module LuckySneaks
+module Stringex
   # This implementation borrows from Sven Fuch's i18n for Ruby
   # http://github.com/svenfuchs/i18n/tree/master
   #
@@ -11,19 +11,19 @@ module LuckySneaks
   # key-value pairs of a character's Unicode codepoint and it's desired
   # transliteration. You may also put the character itself.
   # 
-  # FWIW: the methods in LuckySneaks::UnidecoderLocales::ClassMethods
-  # are mixed into LuckySneaks::Unidecoder as class method.
+  # FWIW: the methods in Stringex::UnidecoderLocales::ClassMethods
+  # are mixed into Stringex::Unidecoder as class method.
   module UnidecoderLocales
     LOCALES_CODEPOINTS = Hash.new { |h, k|
       begin
-        if path = LuckySneaks::Unidecoder.load_path.detect{|p| p =~ /\/#{k}.yml$/}
+        if path = Stringex::Unidecoder.load_path.detect{|p| p =~ /\/#{k}.yml$/}
           x = YAML::load_file(path)
           h[k] = x
         else
-          raise LuckySneaks::Unidecoder::InvalidLoadPath
+          raise Stringex::Unidecoder::InvalidLoadPath
         end
       rescue
-        raise LuckySneaks::Unidecoder::InvalidLoadPath
+        raise Stringex::Unidecoder::InvalidLoadPath
       end
     } unless defined?(LOCALES_CODEPOINTS)
     
@@ -65,8 +65,8 @@ module LuckySneaks
       
       def try_locales(codepoint, locale_arg = locale)
         return if locale_arg.nil?
-        LuckySneaks::UnidecoderLocales::LOCALES_CODEPOINTS[locale_arg][codepoint] ||
-          LuckySneaks::UnidecoderLocales::LOCALES_CODEPOINTS[locale_arg][codepoint.unpack("U").first]
+        Stringex::UnidecoderLocales::LOCALES_CODEPOINTS[locale_arg][codepoint] ||
+          Stringex::UnidecoderLocales::LOCALES_CODEPOINTS[locale_arg][codepoint.unpack("U").first]
       end
     end
   end

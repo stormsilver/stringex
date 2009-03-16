@@ -1,10 +1,10 @@
 require "yaml"
-require "lucky_sneaks/unidecoder_exceptions"
-require "lucky_sneaks/unidecoder_locales"
+require "stringex/unidecoder_exceptions"
+require "stringex/unidecoder_locales"
 
-module LuckySneaks
+module Stringex
   module Unidecoder
-    include LuckySneaks::UnidecoderLocales
+    include Stringex::UnidecoderLocales
     
     # Contains Unicode codepoints, loading as needed from YAML files
     CODEPOINTS = Hash.new { |h, k|
@@ -47,7 +47,7 @@ module LuckySneaks
       def use_default(codepoint)
         unpacked = codepoint.unpack("U")[0]
         begin
-          LuckySneaks::Unidecoder::CODEPOINTS[code_group(unpacked)][grouped_point(unpacked)]
+          Stringex::Unidecoder::CODEPOINTS[code_group(unpacked)][grouped_point(unpacked)]
         rescue
           # Hopefully this won't come up much
           "?"
@@ -57,13 +57,13 @@ module LuckySneaks
   end
 end
 
-module LuckySneaks
+module Stringex
   module StringExtensions
     # Returns string with its UTF-8 characters transliterated to ASCII ones. Example: 
     # 
     #   "⠋⠗⠁⠝⠉⠑".to_ascii #=> "braille"
     def to_ascii
-      LuckySneaks::Unidecoder.decode(self)
+      Stringex::Unidecoder.decode(self)
     end
   end
 end

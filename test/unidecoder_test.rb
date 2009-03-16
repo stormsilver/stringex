@@ -51,10 +51,10 @@ class UnidecoderTest < Test::Unit::TestCase
   
   def test_unidecoder_decode
     DONT_CONVERT.each do |ascii|
-      assert_equal ascii, LuckySneaks::Unidecoder.decode(ascii)
+      assert_equal ascii, Stringex::Unidecoder.decode(ascii)
     end
     CONVERT_PAIRS.each do |unicode, ascii|
-      assert_equal ascii, LuckySneaks::Unidecoder.decode(unicode)
+      assert_equal ascii, Stringex::Unidecoder.decode(unicode)
     end
   end
   
@@ -74,7 +74,7 @@ class UnidecoderTest < Test::Unit::TestCase
       "00e6" => "æ",
       "042f" => "Я"
     }.each do |codepoint, unicode|
-      assert_equal unicode, LuckySneaks::Unidecoder.encode(codepoint)
+      assert_equal unicode, Stringex::Unidecoder.encode(codepoint)
     end
   end
   
@@ -84,7 +84,7 @@ class UnidecoderTest < Test::Unit::TestCase
       "π" => "x03.yml (line 194)",
       "Я" => "x04.yml (line 49)"
     }.each do |character, output|
-      assert_equal output, LuckySneaks::Unidecoder.in_yaml_file(character)
+      assert_equal output, Stringex::Unidecoder.in_yaml_file(character)
     end
   end
 end
