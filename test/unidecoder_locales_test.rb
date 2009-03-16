@@ -4,6 +4,11 @@ $: << File.join(File.dirname(__FILE__), '../lib')
 require File.join(File.dirname(__FILE__), "../init")
 
 class UnidecoderLocalesTest < Test::Unit::TestCase
+  def teardown
+    LuckySneaks::Unidecoder.load_path = nil
+    LuckySneaks::Unidecoder.locale = nil
+  end
+  
   def test_locale
     assert_nothing_raised {
       LuckySneaks::Unidecoder.locale = :en
@@ -18,13 +23,13 @@ class UnidecoderLocalesTest < Test::Unit::TestCase
     assert ["/path/to/yaml"], LuckySneaks::Unidecoder.load_path
   end
   
-  def test_try_locales
+  def test_decode_with_no_locales
+    assert_equal "?", LuckySneaks::Unidecoder.decode("∞")
+  end
+  
+  def test_decode_with_implicit_locales
     LuckySneaks::Unidecoder.load_path << "test/test.yml"
     LuckySneaks::Unidecoder.locale = :test
     assert_equal "infinity", LuckySneaks::Unidecoder.decode("∞")
-  end
-  
-  def test_decode_with_no_locales
-    assert_equal "?", LuckySneaks::Unidecoder.decode("∞")
   end
 end
