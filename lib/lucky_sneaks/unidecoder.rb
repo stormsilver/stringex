@@ -1,7 +1,10 @@
 require "yaml"
+require "lucky_sneaks/unidecoder_locales"
 
 module LuckySneaks
   module Unidecoder
+    include LuckySneaks::UnidecoderLocales
+    
     # Contains Unicode codepoints, loading as needed from YAML files
     CODEPOINTS = Hash.new { |h, k|
       h[k] = YAML::load_file(File.join(File.dirname(__FILE__), "unidecoder_data", "#{k}.yml"))
@@ -13,13 +16,7 @@ module LuckySneaks
       # You're probably better off just using the added String#to_ascii
       def decode(string)
         string.gsub(/[^\x00-\x7f]/u) do |codepoint|
-          unpacked = codepoint.unpack("U")[0]
-          begin
-            CODEPOINTS[code_group(unpacked)][grouped_point(unpacked)]
-          rescue
-            # Hopefully this won't come up much
-            "?"
-          end
+          try_locales(codepoint) || use_default(codepoint)
         end
       end
       
@@ -44,6 +41,16 @@ module LuckySneaks
       # Returns the index of the given character in the YAML file for its codepoint group
       def grouped_point(unpacked_character)
         unpacked_character & 255
+      end
+      
+      def use_default(codepoint)
+        unpacked = codepoint.unpack("U")[0]
+        begin
+          LuckySneaks::Unidecoder::CODEPOINTS[code_group(unpacked)][grouped_point(unpacked)]
+        rescue
+          # Hopefully this won't come up much
+          "?"
+        end
       end
     end
   end
