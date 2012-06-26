@@ -53,6 +53,8 @@ class StringExtensionsTest < Test::Unit::TestCase
         "period-dot-period",
       "Will…This Work?" =>
         "will-dot-dot-dot-this-work",
+        "with a | pipe" =>
+        "with-a-pipe",
       "¼ pound with cheese" =>
         "one-fourth-pound-with-cheese",
       "Will's Ferrel" =>

@@ -88,18 +88,18 @@ module Stringex
       separator = self.class.duplicate_count_separator
       base_url = self.send(url_attribute)
       base_url = self.send(self.class.attribute_to_urlify).to_s.to_url(:allow_slash => self.allow_slash, :limit => self.url_limit) if base_url.blank? || !self.only_when_blank
-      conditions = ["#{url_attribute} LIKE ?", base_url+'%']
-      unless new_record?
-        conditions.first << " and id != ?"
-        conditions << id
-      end
-      if self.class.scope_for_url
-        conditions.first << " and #{self.class.scope_for_url} = ?"
-        conditions << send(self.class.scope_for_url)
-      end
-      url_owners = self.class.find(:all, :conditions => conditions)
       write_attribute url_attribute, base_url
       unless self.class.allow_duplicates
+        conditions = ["#{url_attribute} LIKE ?", base_url+'%']
+        unless new_record?
+          conditions.first << " and id != ?"
+          conditions << id
+        end
+        if self.class.scope_for_url
+          conditions.first << " and #{self.class.scope_for_url} = ?"
+          conditions << send(self.class.scope_for_url)
+        end
+        url_owners = self.class.find(:all, :conditions => conditions)
         if url_owners.any?{|owner| owner.send(url_attribute) == base_url}
           n = 1
           while url_owners.any?{|owner| owner.send(url_attribute) == "#{base_url}#{separator}#{n}"}
